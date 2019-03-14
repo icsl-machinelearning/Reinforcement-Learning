@@ -13,6 +13,9 @@ num_episodes = 8000
 rList = []
 
 for i in range(num_episodes):
+
+
+
     #e = 1. / ((i//100)+1) # decaying e-greedy
 
     # Reset environment and get first new observation
