@@ -35,7 +35,7 @@ class DQN:
             layer1 = tf.nn.tanh(tf.matmul(self._X, W1))
 
             # Second layer of weights
-            W2 = tf.get_varialbe("W2", shape=[h_size, self.output_size],
+            W2 = tf.get_variable("W2", shape=[h_size, self.output_size],
                                  initializer = tf.contrib.layers.xavier_initializer())
 
             # Q prediction
@@ -45,7 +45,7 @@ class DQN:
         self._Y = tf.placeholder(shape=[None, self.output_size], dtype=tf.float32)
 
         # Loss function
-        self._loss = tf.reduce_mean(tf.square(self._Y - self_Qpred))
+        self._loss = tf.reduce_mean(tf.square(self._Y - self._Qpred))
         # Learning
         self._train = tf.train.AdamOptimizer(learning_rate=l_rate).minimize(self._loss)
 
@@ -54,7 +54,7 @@ class DQN:
         return self.session.run(self._Qpred, feed_dict = {self._X: x})
 
     def update(self, x_stack, y_stack):
-        return self.session.run.([self._loss, self._train], feed_dict={
+        return self.session.run([self._loss, self._train], feed_dict={
             self._X: x_stack, self._Y: y_stack})
 
 
@@ -73,7 +73,7 @@ def simple_replay_train(DQN, train_batch):
             # Obtain the Q' values by feeding the new state through our network
             Q[0, action] = reward + dis * np.max(DQN.predict(next_state))
 
-        y_stack = np.vstack([y_stack], Q])
+        y_stack = np.vstack([y_stack, Q])
         x_stack = np.vstack([x_stack, state])
 
     # Train our network using target and predicted Q values on each episode
@@ -99,7 +99,7 @@ def main():
     replay_buffer = deque()
 
     with tf.Session() as sess:
-        mainDQN = dqn.DQN(sess, input_size, output_size)
+        mainDQN = DQN(sess, input_size, output_size)
         tf.global_variables_initializer().run()
 
         for episode in range(max_episodes):
